@@ -135,7 +135,7 @@ jobs:
       
       - name: Build and push App image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/devops-app:latest ./app
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/devops-app:latest ./backend
           docker push ${{ secrets.DOCKER_USERNAME }}/devops-app:latest
           echo "✅ App image pushed to DockerHub"
 
