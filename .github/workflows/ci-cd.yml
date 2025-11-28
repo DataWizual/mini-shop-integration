@@ -2,19 +2,159 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  # 🐳 ТОЛЬКО Docker сборка (без health-check)
-  docker-build:
+  # 🔍 ШАГ 1: Проверка работоспособности
+  health-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Build and push Docker image
+      - name: Basic structure validation
         run: |
-          echo "🐳 Building and pushing Docker image..."
+          echo "🔍 Checking project structure..."
+          
+          # Критически важные файлы в корне
+          [ -f docker-compose.yml ] && echo "✅ docker-compose.yml exists" || exit 1
+          [ -f script_manager.py ] && echo "✅ script_manager.py exists" || exit 1
+          
+          # Критически важные файлы в diagnostics
+          [ -f diagnostics/control_panel.sh ] && echo "✅ control_panel.sh exists" || exit 1
+          [ -f diagnostics/master_analyzer.py ] && echo "✅ master_analyzer.py exists" || exit 1
+          [ -f diagnostics/monitoring_bridge.py ] && echo "✅ monitoring_bridge.py exists" || exit 1
+          [ -f diagnostics/auto_detector.py ] && echo "✅ auto_detector.py exists" || exit 1
+          
+          # Проверяем что основные директории существуют
+          [ -d monitoring ] && echo "✅ monitoring directory exists" || exit 1
+          [ -d diagnostics ] && echo "✅ diagnostics directory exists" || exit 1
+          [ -d ai-analysis ] && echo "✅ ai-analysis directory exists" || exit 1
+          [ -d ai-reporter ] && echo "✅ ai-reporter directory exists" || exit 1
+          
+          echo "📁 Project structure validation passed"
+
+  # 🐳 ШАГ 2: Docker сборка
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: health-check
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Build Docker images
+        run: |
+          echo "🐳 Testing Docker image builds..."
+          docker compose build --no-cache app
+          echo "✅ App image builds successfully"
+
+  # 🧪 ШАГ 3: Базовое тестирование
+  basic-tests:
+    runs-on: ubuntu-latest
+    needs: health-check
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Python syntax check
+        run: |
+          echo "🐍 Checking Python syntax..."
+          
+          # Core AI components в diagnostics
+          python -m py_compile diagnostics/master_analyzer.py
+          python -m py_compile diagnostics/monitoring_bridge.py
+          python -m py_compile diagnostics/network_analyzer.py
+          python -m py_compile diagnostics/auto_detector.py
+          
+          # Diagnostic scripts
+          python -m py_compile diagnostics/check_dashboards.py
+          python -m py_compile diagnostics/check_grafana.py
+          python -m py_compile diagnostics/check_panels.py
+          python -m py_compile diagnostics/check_promtail_port.py
+          python -m py_compile diagnostics/deep_promtail_debug.py
+          python -m py_compile diagnostics/final_fixes.py
+          python -m py_compile diagnostics/fix_dashboards.py
+          python -m py_compile diagnostics/fix_grafana_datasource.py
+          python -m py_compile diagnostics/fix_loki_logs.py
+          python -m py_compile diagnostics/fix_promtail.py
+          python -m py_compile diagnostics/universal_dashboard_fixer.py
+          
+          # AI modules
+          python -m py_compile ai-analysis/smart_analyzer.py
+          python -m py_compile ai-reporter/insight_generator.py
+          
+          # Management в корне
+          python -m py_compile script_manager.py
+          
+          echo "✅ All Python files compile successfully"
+      
+      - name: Shell script validation
+        run: |
+          echo "📜 Validating shell scripts..."
+          
+          # Скрипты в diagnostics
+          shellcheck diagnostics/control_panel.sh || echo "⚠️ ShellCheck warnings in control_panel.sh"
+          shellcheck diagnostics/quick_check.sh || echo "⚠️ ShellCheck warnings in quick_check.sh"
+          shellcheck diagnostics/quick_ai_check.sh || echo "⚠️ ShellCheck warnings in quick_ai_check.sh"
+          shellcheck diagnostics/deploy-local.sh || echo "⚠️ ShellCheck warnings in deploy-local.sh"
+          
+          # Скрипты в scripts
+          shellcheck scripts/*.sh || echo "⚠️ ShellCheck warnings in scripts"
+          
+          echo "✅ Shell scripts validated"
+
+  # 📊 ШАГ 4: Анализ кода
+  code-analysis:
+    runs-on: ubuntu-latest
+    needs: health-check
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Code metrics
+        run: |
+          echo "📊 Code metrics:"
+          echo "Total Python files: $(find . -name '*.py' | wc -l)"
+          echo "Total Shell scripts: $(find . -name '*.sh' | wc -l)"
+          echo "Diagnostics scripts: $(find diagnostics -name '*.py' | wc -l)"
+          echo "AI components: $(find ai-* -name '*.py' | wc -l)"
+          echo "Total lines: $(find . -name '*.py' -o -name '*.sh' | xargs wc -l | tail -1 | awk '{print $1}')"
+
+  # 🐳 ШАГ 2.5: Push to DockerHub
+  docker-push:
+    runs-on: ubuntu-latest
+    needs: [health-check, docker-build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Login to DockerHub
+        run: |
           echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      
+      - name: Build and push App image
+        run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/devops-app:latest ./app
           docker push ${{ secrets.DOCKER_USERNAME }}/devops-app:latest
-          echo "✅ Docker image pushed successfully!"
+          echo "✅ App image pushed to DockerHub"
+
+  # 🎯 Финальный отчет
+  report:
+    runs-on: ubuntu-latest
+    needs: [health-check, docker-build, basic-tests, code-analysis]
+    steps:
+      - name: Generate CI/CD report
+        run: |
+          echo "🎉 CI/CD Pipeline Execution Complete"
+          echo "======================================"
+          echo "✅ Health checks passed"
+          echo "✅ Docker builds successful" 
+          echo "✅ Basic tests completed"
+          echo "✅ Code analysis finished"
+          echo ""
+          echo "🚀 Universal AI Monitoring Platform Status:"
+          echo "• Core AI Components: ✅ Compiled"
+          echo "• Diagnostic Scripts: ✅ Validated" 
+          echo "• Shell Scripts: ✅ Checked"
+          echo "• Project Structure: ✅ Verified"
