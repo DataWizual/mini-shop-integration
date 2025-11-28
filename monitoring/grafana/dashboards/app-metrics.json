@@ -1,0 +1,46 @@
+{
+  "title": "App Metrics",
+  "tags": ["application", "flask"],
+  "timezone": "browser",
+  "refresh": "5s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Total Requests",
+      "targets": [
+        {
+          "expr": "sum(app_requests_total)",
+          "legendFormat": "Total"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "type": "timeseries", 
+      "title": "Request Rate",
+      "targets": [
+        {
+          "expr": "rate(app_requests_total[1m])",
+          "legendFormat": "req/s"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Request Latency",
+      "targets": [
+        {
+          "expr": "rate(app_request_latency_seconds_sum[1m]) / rate(app_request_latency_seconds_count[1m])",
+          "legendFormat": "avg latency"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+    }
+  ],
+  "schemaVersion": 36,
+  "version": 1
+}

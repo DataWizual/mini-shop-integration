@@ -1,0 +1,50 @@
+{
+  "dashboard": {
+    "title": "📝 Logs - HUMAN READABLE FORMAT", 
+    "tags": ["logs", "human", "simple"],
+    "panels": [
+      {
+        "title": "📋 HOW TO READ LOGS",
+        "type": "text",
+        "content": "# 📖 LOGS INSTRUCTION GUIDE\n\n## 🟢 INFO - EVERYTHING OK\n- Requests processing\n- Services running\n- Normal activity\n\n## 🟡 WARN - ATTENTION NEEDED\n- Slow requests\n- Unusual situations\n- Need to check but not urgent\n\n## 🔴 ERROR - PROBLEM DETECTED\n- Code errors\n- Services not responding\n- Urgent fix required\n\n## 💡 WHAT TO LOOK FOR:\n- Multiple ERROR in a row\n- Unusual WARN messages\n- Sudden log volume changes",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "title": "📊 LOGS STATISTICS BY LEVEL",
+        "type": "piechart",
+        "targets": [{
+          "expr": "count_over_time({container=\"devops_app\"} |~ \"level=info\" [5m])",
+          "legendFormat": "INFO - normal"
+        }, {
+          "expr": "count_over_time({container=\"devops_app\"} |~ \"level=warn\" [5m])", 
+          "legendFormat": "WARN - attention"
+        }, {
+          "expr": "count_over_time({container=\"devops_app\"} |~ \"level=error\" [5m])",
+          "legendFormat": "ERROR - problems"
+        }],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "title": "🔍 RECENT ERRORS (IF ANY)",
+        "type": "logs",
+        "targets": [{
+          "expr": "{container=\"devops_app\"} |~ \"ERROR\"",
+          "refId": "A"
+        }],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+      },
+      {
+        "title": "📈 APPLICATION ACTIVITY",
+        "type": "logs", 
+        "targets": [{
+          "expr": "{container=\"devops_app\"}",
+          "refId": "A"
+        }],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16}
+      }
+    ],
+    "time": {"from": "now-1h", "to": "now"},
+    "refresh": "15s"
+  },
+  "overwrite": true
+}

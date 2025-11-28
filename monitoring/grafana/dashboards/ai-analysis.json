@@ -1,0 +1,74 @@
+{
+  "title": "AI Log Analysis",
+  "tags": ["ai", "analysis", "logs"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Request Rate",
+      "targets": [
+        {
+          "expr": "rate(app_requests_total[1m])",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Total Errors",
+      "targets": [
+        {
+          "expr": "app_errors_total",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "red", "value": 1}
+            ]
+          }
+        }
+      },
+      "gridPos": {"h": 6, "w": 6, "x": 6, "y": 0}
+    },
+    {
+      "id": 3,
+      "type": "logs",
+      "title": "Recent Logs for AI Analysis",
+      "datasource": {"type": "loki", "uid": "Loki"},
+      "targets": [
+        {
+          "expr": "{job=\"containerlogs\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true,
+        "showLabels": true
+      },
+      "gridPos": {"h": 10, "w": 12, "x": 0, "y": 6}
+    }
+  ],
+  "schemaVersion": 36,
+  "version": 1
+}

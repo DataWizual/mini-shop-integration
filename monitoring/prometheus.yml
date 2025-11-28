@@ -1,0 +1,43 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: 'development'
+    cluster: 'devops-starter'
+
+# Rule files
+rule_files:
+  - "alert_rules.yml"
+
+scrape_configs:
+  # Flask app metrics
+  - job_name: "app"
+    static_configs:
+      - targets: ["minishop_app:5000"]
+    metrics_path: /metrics
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # cAdvisor container metrics
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+    scrape_interval: 15s
+
+  # Promtail metrics
+  - job_name: "promtail"
+    static_configs:
+      - targets: ["promtail:9080"]
+    scrape_interval: 15s
+
+  # Prometheus self-monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+    scrape_interval: 30s
+
+  # Node exporter
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+

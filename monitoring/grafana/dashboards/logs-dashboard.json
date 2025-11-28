@@ -1,0 +1,46 @@
+{
+  "title": "Application Logs",
+  "tags": ["logs", "loki"], 
+  "timezone": "browser",
+  "refresh": "10s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "logs",
+      "title": "All Container Logs",
+      "datasource": {"type": "loki", "uid": "Loki"},
+      "targets": [
+        {
+          "expr": "{job=\"containerlogs\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true,
+        "showLabels": true
+      },
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "type": "logs",
+      "title": "Recent Logs (last 1 hour)",
+      "datasource": {"type": "loki", "uid": "Loki"},
+      "targets": [
+        {
+          "expr": "{job=\"containerlogs\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true, 
+        "wrapLogMessage": true,
+        "showLabels": true
+      },
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 10}
+    }
+  ],
+  "schemaVersion": 36,
+  "version": 1
+}

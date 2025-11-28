@@ -1,0 +1,101 @@
+{
+  "dashboard": {
+    "title": "🤖 System Health - SIMPLE AND CLEAR",
+    "tags": ["human", "simple", "health"],
+    "panels": [
+      {
+        "title": "💚 OVERALL SYSTEM STATUS",
+        "type": "text",
+        "content": "# 🎯 QUICK DIAGNOSTICS\n\n## ✅ WHAT'S GOOD:\n- System running stable\n- All services available\n- Memory within limits\n- CPU not overloaded\n\n## ⚠️ NEED ATTENTION:\n- Network load\n- Free disk space\n- Error count in logs\n\n## 🚨 ALERT SIGNALS:\n- Memory > 85% - need cleanup\n- CPU > 80% - check for leaks\n- Disk > 90% - urgent cleanup\n- Errors > 5% - check code",
+        "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0}
+      },
+      {
+        "title": "🧠 MEMORY - SIMPLE EXPLANATION",
+        "type": "stat",
+        "targets": [{
+          "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+          "legendFormat": "Memory used"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 70, "color": "yellow"},
+                {"value": 85, "color": "red"}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 6, "w": 6, "x": 0, "y": 10}
+      },
+      {
+        "title": "⚡ CPU - PROCESSOR LOAD",
+        "type": "stat", 
+        "targets": [{
+          "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+          "legendFormat": "CPU load"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 50, "color": "yellow"},
+                {"value": 80, "color": "red"}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 6, "w": 6, "x": 6, "y": 10}
+      },
+      {
+        "title": "💾 DISK - FREE SPACE",
+        "type": "stat",
+        "targets": [{
+          "expr": "(1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100",
+          "legendFormat": "Disk space used"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent", 
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 80, "color": "yellow"},
+                {"value": 90, "color": "red"}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 6, "w": 6, "x": 12, "y": 10}
+      },
+      {
+        "title": "📱 OUR APPLICATION - ACTIVITY",
+        "type": "stat",
+        "targets": [{
+          "expr": "sum(rate(app_requests_total[5m]))",
+          "legendFormat": "Requests per second"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "blue"},
+                {"value": 1, "color": "green"},
+                {"value": 5, "color": "yellow"}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 6, "w": 6, "x": 18, "y": 10}
+      }
+    ],
+    "time": {"from": "now-1h", "to": "now"},
+    "refresh": "10s"
+  },
+  "overwrite": true
+}

@@ -1,0 +1,151 @@
+{
+  "id": null,
+  "uid": "ai-devops-monitor",
+  "title": "AI DevOps Monitor",
+  "tags": ["ai", "monitoring", "devops"],
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "title": "🔄 Service Availability",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "count(up == 1)",
+          "legendFormat": "available"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": 0},
+              {"color": "yellow", "value": 2},
+              {"color": "green", "value": 4}
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "title": "📊 Business Requests/Hour",
+      "type": "stat", 
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(rate(app_business_requests_total[1h]))",
+          "legendFormat": "requests/hour"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "req/hr",
+          "decimals": 1
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+    },
+    {
+      "id": 3,
+      "title": "🐳 Containers (total)",
+      "type": "stat",
+      "datasource": "Prometheus", 
+      "targets": [
+        {
+          "expr": "count(container_memory_usage_bytes)",
+          "legendFormat": "containers"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": 0},
+              {"color": "yellow", "value": 2}, 
+              {"color": "green", "value": 4}
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
+    },
+    {
+      "id": 4,
+      "title": "💾 Application Memory",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "container_memory_usage_bytes{container=~\"devops_app|app\"}",
+          "legendFormat": "{{container}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "min": 0
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
+    },
+    {
+      "id": 5,
+      "title": "🧠 AI Recommendations",
+      "type": "text",
+      "options": {
+        "mode": "markdown",
+        "content": "## 🤖 AI System Analysis\n\nRun to get insights:\n\n```bash\npython3 master_analyzer.py\n```\n\nOr with email report:\n\n```bash\npython3 master_analyzer.py --email\n```\n\n**Latest report:**\n- System health: 100/100 ✅\n- Services: 4/4 available 🟢\n- Performance: FAST ⚡"
+      },
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 8}
+    },
+    {
+      "id": 6,
+      "title": "📈 Requests Per Minute",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "rate(app_requests_total[1m]) * 60",
+          "legendFormat": "RPM"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "rpm"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20}
+    },
+    {
+      "id": 7,
+      "title": "🚨 Errors/Hour",
+      "type": "timeseries", 
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "rate(app_errors_total[1h])",
+          "legendFormat": "errors/hour"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "req/hr",
+          "color": {"mode": "palette-classic"}
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20}
+    }
+  ],
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "30s"
+}

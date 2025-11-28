@@ -1,0 +1,68 @@
+{
+  "dashboard": {
+    "title": "💰 BUSINESS METRICS - FOR NON-TECHNICAL USERS",
+    "tags": ["business", "simple", "human"],
+    "panels": [
+      {
+        "title": "💼 WHAT WE MONITOR",
+        "type": "text", 
+        "content": "# 🎯 BUSINESS INDICATORS\n\n## 📊 USER ACTIVITY:\n- User views\n- Orders list\n- Total activity\n\n## ⚡ PERFORMANCE:\n- API response speed\n- Error count\n- Service availability\n\n## 📈 TRENDS:\n- Activity growth/decline\n- Popular features\n- Problem areas",
+        "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0}
+      },
+      {
+        "title": "👥 USER ACTIVITY",
+        "type": "stat",
+        "targets": [{
+          "expr": "sum(app_business_requests_total) by (request_type)",
+          "legendFormat": "{{request_type}}"
+        }],
+        "gridPos": {"h": 6, "w": 8, "x": 0, "y": 10}
+      },
+      {
+        "title": "🚀 REQUESTS PER SECOND",
+        "type": "gauge",
+        "targets": [{
+          "expr": "sum(rate(app_business_requests_total[5m]))",
+          "legendFormat": "Business requests/sec"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "blue"},
+                {"value": 0.1, "color": "green"},
+                {"value": 1, "color": "yellow"}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 6, "w": 8, "x": 8, "y": 10}
+      },
+      {
+        "title": "⏱️ RESPONSE SPEED",
+        "type": "stat",
+        "targets": [{
+          "expr": "histogram_quantile(0.95, rate(app_request_latency_seconds_bucket[5m])) * 1000",
+          "legendFormat": "Response time (ms)"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 100, "color": "yellow"},
+                {"value": 500, "color": "red"}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 6, "w": 8, "x": 16, "y": 10}
+      }
+    ],
+    "time": {"from": "now-1h", "to": "now"},
+    "refresh": "10s"
+  },
+  "overwrite": true
+}
